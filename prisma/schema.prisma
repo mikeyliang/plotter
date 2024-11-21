@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["jsonProtocol"]
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl         = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  shadowDatabaseUrl = env("POSTGRES_URL_NON_POOLING") // used for migrations
+}
+
+model users {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  image     String
+  createdAt DateTime @default(now())
+  viewed_experiments viewed_experiment[]
+  page_viewed        page_viewed[]
+  cta_clicked        cta_clicked[]
+}
+
+model viewed_experiment {
+  id            Int      @id @default(autoincrement())
+  user_id       users    @relation(fields: [id], references: [id])
+  timestamp     DateTime @default(now())
+  experiment_id String
+  variation_id  String
+}
+
+model page_viewed {
+  id        Int      @id @default(autoincrement())
+  user_id   users    @relation(fields: [id], references: [id])
+  timestamp DateTime @default(now())
+  page_name String
+}
+
+model cta_clicked {
+  id        Int      @id @default(autoincrement())
+  user_id   users    @relation(fields: [id], references: [id])
+  timestamp DateTime @default(now())
+  page_name String
+}
